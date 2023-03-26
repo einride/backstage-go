@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"os"
+
 	"github.com/adrg/xdg"
 	"github.com/spf13/cobra"
 	"go.einride.tech/backstage/catalog"
-	"os"
 )
 
 func main() {
