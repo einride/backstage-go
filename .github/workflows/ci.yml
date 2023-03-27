@@ -1,0 +1,28 @@
+name: ci
+
+on:
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Sage
+        uses: einride/sage/actions/setup@master
+        with:
+          go-version: "1.20"
+
+      - name: Make
+        run: make
+
+      - name: Dry-run semantic-release
+        run: make semantic-release repo=${{ github.repository }} dry=true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Dry-run GoReleaser
+        run: make go-releaser snapshot=true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
