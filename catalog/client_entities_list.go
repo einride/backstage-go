@@ -40,9 +40,13 @@ func (c *Client) ListEntities(ctx context.Context, _ *ListEntitiesRequest) (*Lis
 		Entities: make([]*Entity, 0, len(rawEntities)),
 	}
 	for _, rawEntity := range rawEntities {
-		response.Entities = append(response.Entities, &Entity{
+		entity := &Entity{
 			Raw: rawEntity,
-		})
+		}
+		if err := json.Unmarshal(rawEntity, &entity); err != nil {
+			return nil, err
+		}
+		response.Entities = append(response.Entities, entity)
 	}
 	return &response, nil
 }
