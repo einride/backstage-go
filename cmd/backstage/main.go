@@ -111,17 +111,31 @@ func newListEntitiesCommand() *cobra.Command {
 		Use:   "list-entities",
 		Short: "List entities in the catalog",
 	}
+	filters := cmd.Flags().StringArray("filter", nil, "select only a subset of all entities")
+	fields := cmd.Flags().StringSlice("fields", nil, "select only parts of each entity")
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		client, err := newCatalogClient()
 		if err != nil {
 			return err
 		}
-		response, err := client.ListEntities(cmd.Context(), &catalog.ListEntitiesRequest{})
-		if err != nil {
-			return err
-		}
-		for _, entity := range response.Entities {
-			printRawJSON(cmd, entity.Raw)
+		var nextPageToken string
+		for {
+			response, err := client.ListEntities(cmd.Context(), &catalog.ListEntitiesRequest{
+				Filters: *filters,
+				Fields:  *fields,
+				Limit:   100,
+				After:   nextPageToken,
+			})
+			if err != nil {
+				return err
+			}
+			for _, entity := range response.Entities {
+				printRawJSON(cmd, entity.Raw)
+			}
+			nextPageToken = response.NextPageToken
+			if nextPageToken == "" {
+				break
+			}
 		}
 		return nil
 	}
