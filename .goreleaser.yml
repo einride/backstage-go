@@ -1,0 +1,25 @@
+before:
+  hooks:
+    - go mod download
+
+builds:
+  - id: backstage
+    binary: backstage
+    dir: ./cmd/backstage
+    main: main.go
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+
+checksum:
+  name_template: "checksums.txt"
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+release:
+  github:
+  prerelease: auto
