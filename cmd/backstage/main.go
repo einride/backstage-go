@@ -43,20 +43,18 @@ func newCatalogClient() (*catalog.Client, error) {
 }
 
 func newBackstageCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "backstage",
-		Short: "Backstage CLI",
-	}
+	cmd := newCommand()
+	cmd.Use = "backstage"
+	cmd.Short = "Backstage CLI"
 	cmd.AddCommand(newAuthCommand())
 	cmd.AddCommand(newCatalogCommand())
 	return cmd
 }
 
 func newAuthCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "auth",
-		Short: "Authenticate with a Backstage instance.",
-	}
+	cmd := newCommand()
+	cmd.Use = "auth"
+	cmd.Short = "Authenticate with a Backstage instance."
 	cmd.AddCommand(newLoginCommand())
 	return cmd
 }
@@ -67,10 +65,9 @@ type authFile struct {
 }
 
 func newLoginCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "login",
-		Short: "Login to a Backstage instance",
-	}
+	cmd := newCommand()
+	cmd.Use = "login"
+	cmd.Short = "Login to a Backstage instance"
 	baseURL := cmd.Flags().String("base-url", "", "backend base URL to login with")
 	_ = cmd.MarkFlagRequired("base-url")
 	token := cmd.PersistentFlags().String("token", "", "bearer token to use for authentication")
@@ -98,29 +95,26 @@ func newLoginCommand() *cobra.Command {
 }
 
 func newCatalogCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "catalog",
-		Short: "Work with the Backstage catalog",
-	}
+	cmd := newCommand()
+	cmd.Use = "catalog"
+	cmd.Short = "Work with the Backstage catalog"
 	cmd.AddCommand(newEntitiesCommand())
 	return cmd
 }
 
 func newEntitiesCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "entities",
-		Short: "Read entities from the Backstage catalog",
-	}
+	cmd := newCommand()
+	cmd.Use = "entities"
+	cmd.Short = "Read entities from the Backstage catalog"
 	cmd.AddCommand(newEntitiesListCommand())
 	cmd.AddCommand(newEntitiesGetByNameCommand())
 	return cmd
 }
 
 func newEntitiesListCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "list",
-		Short: "List entities in the catalog",
-	}
+	cmd := newCommand()
+	cmd.Use = "list"
+	cmd.Short = "List entities in the catalog"
 	filters := cmd.Flags().StringArray("filter", nil, "select only a subset of all entities")
 	fields := cmd.Flags().StringSlice("fields", nil, "select only parts of each entity")
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
@@ -153,10 +147,9 @@ func newEntitiesListCommand() *cobra.Command {
 }
 
 func newEntitiesGetByNameCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "get-by-name",
-		Short: "Get an entity by its kind, namespace and name",
-	}
+	cmd := newCommand()
+	cmd.Use = "get-by-name"
+	cmd.Short = "Get an entity by its kind, namespace and name"
 	kind := cmd.Flags().String("kind", "", "kind of the entity to get")
 	_ = cmd.MarkFlagRequired("kind")
 	namespace := cmd.Flags().String("namespace", "default", "namespace of the entity to get")
@@ -186,4 +179,11 @@ func printRawJSON(cmd *cobra.Command, raw json.RawMessage) {
 	indented.Grow(len(raw) * 2)
 	_ = json.Indent(&indented, raw, "", " ")
 	cmd.Println(indented.String())
+}
+
+func newCommand() *cobra.Command {
+	cmd := &cobra.Command{}
+	cmd.SetOut(os.Stdout)
+	cmd.SetErr(os.Stderr)
+	return cmd
 }
