@@ -107,6 +107,7 @@ func newEntitiesCommand() *cobra.Command {
 	cmd.Use = "entities"
 	cmd.Short = "Read entities from the Backstage catalog"
 	cmd.AddCommand(newEntitiesListCommand())
+	cmd.AddCommand(newEntitiesGetByUIDCommand())
 	cmd.AddCommand(newEntitiesGetByNameCommand())
 	return cmd
 }
@@ -164,6 +165,29 @@ func newEntitiesGetByNameCommand() *cobra.Command {
 			Kind:      *kind,
 			Namespace: *namespace,
 			Name:      *name,
+		})
+		if err != nil {
+			return err
+		}
+		printRawJSON(cmd, entity.Raw)
+		return nil
+	}
+	return cmd
+}
+
+func newEntitiesGetByUIDCommand() *cobra.Command {
+	cmd := newCommand()
+	cmd.Use = "get-by-uid"
+	cmd.Short = "Get an entity by its UID"
+	uid := cmd.Flags().String("uid", "", "UID of the entity to get")
+	_ = cmd.MarkFlagRequired("uid")
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		client, err := newCatalogClient()
+		if err != nil {
+			return err
+		}
+		entity, err := client.GetEntityByUID(cmd.Context(), &catalog.GetEntityByUIDRequest{
+			UID: *uid,
 		})
 		if err != nil {
 			return err
