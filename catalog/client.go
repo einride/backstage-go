@@ -1,9 +1,10 @@
 package catalog
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 )
@@ -68,18 +69,8 @@ func (c *Client) get(
 	path string,
 	query url.Values,
 	fn func(*http.Response) error,
-) error {
-	return c.execute(ctx, http.MethodGet, path, query, nil, fn)
-}
-
-func (c *Client) execute(
-	ctx context.Context,
-	method string,
-	path string,
-	query url.Values,
-	body io.Reader,
-	fn func(*http.Response) error,
 ) (err error) {
+	const method = http.MethodGet
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("%s %s: %w", method, path, err)
@@ -92,10 +83,47 @@ func (c *Client) execute(
 	if len(query) > 0 {
 		requestURL.RawQuery = query.Encode()
 	}
-	httpRequest, err := http.NewRequestWithContext(ctx, method, requestURL.String(), body)
+	httpRequest, err := http.NewRequestWithContext(ctx, method, requestURL.String(), nil)
 	if err != nil {
 		return err
 	}
+	httpResponse, err := c.httpClient.Do(httpRequest)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = httpResponse.Body.Close()
+	}()
+	if httpResponse.StatusCode != http.StatusOK {
+		return newStatusError(httpResponse)
+	}
+	if fn != nil {
+		return fn(httpResponse)
+	}
+	return nil
+}
+
+func (c *Client) post(
+	ctx context.Context,
+	path string,
+	body any,
+	fn func(*http.Response) error,
+) (err error) {
+	const method = http.MethodPost
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("%s %s: %w", method, path, err)
+		}
+	}()
+	bodyData, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+	httpRequest, err := http.NewRequestWithContext(ctx, method, c.config.baseURL+path, bytes.NewReader(bodyData))
+	if err != nil {
+		return err
+	}
+	httpRequest.Header.Set("Content-Type", "application/json")
 	httpResponse, err := c.httpClient.Do(httpRequest)
 	if err != nil {
 		return err
