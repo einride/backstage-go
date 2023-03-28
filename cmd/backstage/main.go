@@ -110,6 +110,7 @@ func newEntitiesCommand() *cobra.Command {
 	cmd.AddCommand(newEntitiesGetByUIDCommand())
 	cmd.AddCommand(newEntitiesGetByNameCommand())
 	cmd.AddCommand(newEntitiesDeleteByUIDCommand())
+	cmd.AddCommand(newEntitiesBatchGetByRefsCommand())
 	return cmd
 }
 
@@ -213,6 +214,37 @@ func newEntitiesDeleteByUIDCommand() *cobra.Command {
 		return client.DeleteEntityByUID(cmd.Context(), &catalog.DeleteEntityByUIDRequest{
 			UID: *uid,
 		})
+	}
+	return cmd
+}
+
+func newEntitiesBatchGetByRefsCommand() *cobra.Command {
+	cmd := newCommand()
+	cmd.Use = "batch-get-by-refs"
+	cmd.Short = "Batch get entities by their refs"
+	entityRefs := cmd.Flags().StringSlice("entity-refs", nil, "refs of the entities to get")
+	_ = cmd.MarkFlagRequired("entity-refs")
+	fields := cmd.Flags().StringSlice("fields", nil, "select only parts of each entity")
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		client, err := newCatalogClient()
+		if err != nil {
+			return err
+		}
+		response, err := client.BatchGetEntitiesByRefs(cmd.Context(), &catalog.BatchGetEntitiesByRefsRequest{
+			EntityRefs: *entityRefs,
+			Fields:     *fields,
+		})
+		if err != nil {
+			return err
+		}
+		for _, entity := range response.Entities {
+			if entity != nil {
+				printRawJSON(cmd, entity.Raw)
+			} else {
+				cmd.Println("null")
+			}
+		}
+		return nil
 	}
 	return cmd
 }
