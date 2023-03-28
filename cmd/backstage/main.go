@@ -102,13 +102,23 @@ func newCatalogCommand() *cobra.Command {
 		Use:   "catalog",
 		Short: "Work with the Backstage catalog",
 	}
-	cmd.AddCommand(newListEntitiesCommand())
+	cmd.AddCommand(newEntitiesCommand())
 	return cmd
 }
 
-func newListEntitiesCommand() *cobra.Command {
+func newEntitiesCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-entities",
+		Use:   "entities",
+		Short: "Read entities from the Backstage catalog",
+	}
+	cmd.AddCommand(newEntitiesListCommand())
+	cmd.AddCommand(newEntitiesGetByNameCommand())
+	return cmd
+}
+
+func newEntitiesListCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "list",
 		Short: "List entities in the catalog",
 	}
 	filters := cmd.Flags().StringArray("filter", nil, "select only a subset of all entities")
@@ -137,6 +147,35 @@ func newListEntitiesCommand() *cobra.Command {
 				break
 			}
 		}
+		return nil
+	}
+	return cmd
+}
+
+func newEntitiesGetByNameCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "get-by-name",
+		Short: "Get an entity by its kind, namespace and name",
+	}
+	kind := cmd.Flags().String("kind", "", "kind of the entity to get")
+	_ = cmd.MarkFlagRequired("kind")
+	namespace := cmd.Flags().String("namespace", "default", "namespace of the entity to get")
+	name := cmd.Flags().String("name", "", "name of the entity to get")
+	_ = cmd.MarkFlagRequired("name")
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		client, err := newCatalogClient()
+		if err != nil {
+			return err
+		}
+		entity, err := client.GetEntityByName(cmd.Context(), &catalog.GetEntityByNameRequest{
+			Kind:      *kind,
+			Namespace: *namespace,
+			Name:      *name,
+		})
+		if err != nil {
+			return err
+		}
+		printRawJSON(cmd, entity.Raw)
 		return nil
 	}
 	return cmd
