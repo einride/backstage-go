@@ -111,3 +111,29 @@ func (c *Client) execute(
 	}
 	return nil
 }
+
+func (c *Client) delete(
+	ctx context.Context,
+	path string,
+) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("%s %s: %w", http.MethodDelete, path, err)
+		}
+	}()
+	httpRequest, err := http.NewRequestWithContext(ctx, http.MethodDelete, c.config.baseURL+path, nil)
+	if err != nil {
+		return err
+	}
+	httpResponse, err := c.httpClient.Do(httpRequest)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = httpResponse.Body.Close()
+	}()
+	if httpResponse.StatusCode != http.StatusNoContent {
+		return newStatusError(httpResponse)
+	}
+	return nil
+}

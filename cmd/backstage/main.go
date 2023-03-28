@@ -109,6 +109,7 @@ func newEntitiesCommand() *cobra.Command {
 	cmd.AddCommand(newEntitiesListCommand())
 	cmd.AddCommand(newEntitiesGetByUIDCommand())
 	cmd.AddCommand(newEntitiesGetByNameCommand())
+	cmd.AddCommand(newEntitiesDeleteByUIDCommand())
 	return cmd
 }
 
@@ -194,6 +195,24 @@ func newEntitiesGetByUIDCommand() *cobra.Command {
 		}
 		printRawJSON(cmd, entity.Raw)
 		return nil
+	}
+	return cmd
+}
+
+func newEntitiesDeleteByUIDCommand() *cobra.Command {
+	cmd := newCommand()
+	cmd.Use = "delete"
+	cmd.Short = "Delete an entity by its UID"
+	uid := cmd.Flags().String("uid", "", "UID of the entity to get")
+	_ = cmd.MarkFlagRequired("uid")
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		client, err := newCatalogClient()
+		if err != nil {
+			return err
+		}
+		return client.DeleteEntityByUID(cmd.Context(), &catalog.DeleteEntityByUIDRequest{
+			UID: *uid,
+		})
 	}
 	return cmd
 }
