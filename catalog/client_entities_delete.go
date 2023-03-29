@@ -12,9 +12,9 @@ type DeleteEntityByUIDRequest struct {
 	UID string
 }
 
-// DeleteEntityByUID gets an entity by its kind, namespace and name.
+// DeleteEntityByUID deletes an entity by its UID.
 //
-// See: https://backstage.io/docs/features/software-catalog/software-catalog-api/#get-entitiesby-uiduid
+// See: https://backstage.io/docs/features/software-catalog/software-catalog-api/#delete-entitiesby-uiduid
 func (c *Client) DeleteEntityByUID(ctx context.Context, request *DeleteEntityByUIDRequest) error {
 	const pathTemplate = "/api/catalog/entities/by-uid/%s"
 	return c.delete(ctx, fmt.Sprintf(pathTemplate, url.PathEscape(request.UID)))

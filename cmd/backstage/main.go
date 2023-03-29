@@ -204,7 +204,7 @@ func newEntitiesDeleteByUIDCommand() *cobra.Command {
 	cmd := newCommand()
 	cmd.Use = "delete"
 	cmd.Short = "Delete an entity by its UID"
-	uid := cmd.Flags().String("uid", "", "UID of the entity to get")
+	uid := cmd.Flags().String("uid", "", "UID of the entity to delete")
 	_ = cmd.MarkFlagRequired("uid")
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		client, err := newCatalogClient()
