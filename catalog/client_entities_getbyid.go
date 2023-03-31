@@ -35,9 +35,7 @@ func (c *Client) GetEntityByUID(ctx context.Context, request *GetEntityByUIDRequ
 	}); err != nil {
 		return nil, err
 	}
-	entity := Entity{
-		Raw: rawEntity,
-	}
+	var entity Entity
 	if err := json.Unmarshal(rawEntity, &entity); err != nil {
 		return nil, err
 	}

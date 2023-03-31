@@ -41,9 +41,7 @@ func (c *Client) GetEntityByName(ctx context.Context, request *GetEntityByNameRe
 	}); err != nil {
 		return nil, err
 	}
-	entity := Entity{
-		Raw: rawEntity,
-	}
+	var entity Entity
 	if err := json.Unmarshal(rawEntity, &entity); err != nil {
 		return nil, err
 	}
