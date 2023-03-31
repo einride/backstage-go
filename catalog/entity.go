@@ -8,19 +8,38 @@ import (
 // An Entity in the software catalog.
 type Entity struct {
 	// APIVersion is the version of specification format for this particular entity.
-	APIVersion string `json:"apiVersion"`
+	APIVersion string
 
 	// Kind is the high-level entity type.
-	Kind EntityKind `json:"kind"`
+	Kind EntityKind
 
 	// Metadata related to the entity.
-	Metadata EntityMetadata `json:"metadata"`
+	Metadata EntityMetadata
 
 	// Relations that this entity has with other entities.
-	Relations []EntityRelation `json:"relations,omitempty"`
+	Relations []EntityRelation
 
 	// Raw entity JSON message.
-	Raw json.RawMessage `json:"-"`
+	Raw json.RawMessage
+}
+
+// UnmarshalJSON implements [json.Unmarshaler].
+func (e *Entity) UnmarshalJSON(data []byte) error {
+	var fields struct {
+		APIVersion string           `json:"apiVersion"`
+		Kind       EntityKind       `json:"kind"`
+		Metadata   EntityMetadata   `json:"metadata"`
+		Relations  []EntityRelation `json:"relations,omitempty"`
+	}
+	if err := json.Unmarshal(data, &fields); err != nil {
+		return err
+	}
+	e.APIVersion = fields.APIVersion
+	e.Kind = fields.Kind
+	e.Metadata = fields.Metadata
+	e.Relations = fields.Relations
+	e.Raw = data
+	return nil
 }
 
 // APISpec decodes the entity's spec as a [APISpec].

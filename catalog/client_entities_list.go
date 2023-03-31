@@ -55,7 +55,7 @@ func (c *Client) ListEntities(ctx context.Context, request *ListEntitiesRequest)
 	if request.After != "" {
 		query.Set("after", request.After)
 	}
-	var rawEntities []json.RawMessage
+	var entities []*Entity
 	var nextPageToken string
 	if err := c.get(ctx, path, query, func(response *http.Response) error {
 		for _, link := range response.Header.Values("link") {
@@ -67,22 +67,12 @@ func (c *Client) ListEntities(ctx context.Context, request *ListEntitiesRequest)
 				nextPageToken = linkURL.Query().Get("after")
 			}
 		}
-		return json.NewDecoder(response.Body).Decode(&rawEntities)
+		return json.NewDecoder(response.Body).Decode(&entities)
 	}); err != nil {
 		return nil, err
 	}
-	response := ListEntitiesResponse{
-		Entities:      make([]*Entity, 0, len(rawEntities)),
+	return &ListEntitiesResponse{
+		Entities:      entities,
 		NextPageToken: nextPageToken,
-	}
-	for _, rawEntity := range rawEntities {
-		entity := &Entity{
-			Raw: rawEntity,
-		}
-		if err := json.Unmarshal(rawEntity, &entity); err != nil {
-			return nil, err
-		}
-		response.Entities = append(response.Entities, entity)
-	}
-	return &response, nil
+	}, nil
 }
