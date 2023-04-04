@@ -18,7 +18,7 @@ func main() {
 	}
 }
 
-const authConfigFile = "backstage/auth.json"
+const authConfigFile = "backstage-go/auth.json"
 
 func newCatalogClient() (*catalog.Client, error) {
 	authFilepath, err := xdg.ConfigFile(authConfigFile)
