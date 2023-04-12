@@ -37,7 +37,7 @@ func Default(ctx context.Context) error {
 	sg.Deps(ctx, GoLint, GoReview)
 	sg.Deps(ctx, GoTest)
 	sg.Deps(ctx, GoModTidy)
-	sg.Deps(ctx, GoLicenses, GitVerifyNoDiff)
+	sg.Deps(ctx, BackstageCatalogValidate, GoLicenses, GitVerifyNoDiff)
 	return nil
 }
 
@@ -84,6 +84,13 @@ func ConvcoCheck(ctx context.Context) error {
 func GitVerifyNoDiff(ctx context.Context) error {
 	sg.Logger(ctx).Println("verifying that git has no diff...")
 	return sggit.VerifyNoDiff(ctx)
+}
+
+func BackstageCatalogValidate(ctx context.Context) error {
+	sg.Logger(ctx).Println("validating Backstage catalog entities...")
+	cmd := sg.Command(ctx, "go", "run", ".", "catalog", "entities", "validate", sg.FromGitRoot(".backstage"))
+	cmd.Dir = sg.FromGitRoot("cmd", "backstage")
+	return cmd.Run()
 }
 
 func SemanticRelease(ctx context.Context, repo string, dry bool) error {

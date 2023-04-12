@@ -43,6 +43,10 @@ update-sage: $(go)
 clean-sage:
 	@git clean -fdx .sage/tools .sage/bin .sage/build
 
+.PHONY: backstage-catalog-validate
+backstage-catalog-validate: $(sagefile)
+	@$(sagefile) BackstageCatalogValidate
+
 .PHONY: convco-check
 convco-check: $(sagefile)
 	@$(sagefile) ConvcoCheck
@@ -89,6 +93,10 @@ go-review: $(sagefile)
 .PHONY: go-test
 go-test: $(sagefile)
 	@$(sagefile) GoTest
+
+.PHONY: schema
+schema: $(sagefile)
+	@$(sagefile) Schema
 
 .PHONY: semantic-release
 semantic-release: $(sagefile)

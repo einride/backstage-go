@@ -1,0 +1,13 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: backstage-go
+  description: Backstage SDK for Go
+  links:
+    - url: https://pkg.go.dev/go.einride.tech/backstage
+      title: GoDoc
+      icon: docs
+spec:
+  type: go-library
+  lifecycle: production
+  owner: team-cloud-control
