@@ -3,12 +3,20 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"io/fs"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/adrg/xdg"
+	"github.com/santhosh-tekuri/jsonschema"
 	"github.com/spf13/cobra"
 	"go.einride.tech/backstage/catalog"
+	"go.einride.tech/backstage/cmd/backstage/internal/schema"
+	"gopkg.in/yaml.v3"
 )
 
 func main() {
@@ -105,7 +113,8 @@ func newCatalogCommand() *cobra.Command {
 func newEntitiesCommand() *cobra.Command {
 	cmd := newCommand()
 	cmd.Use = "entities"
-	cmd.Short = "Read entities from the Backstage catalog"
+	cmd.Short = "Work with entities in the Backstage catalog"
+	cmd.AddCommand(newEntitiesValidateCommand())
 	cmd.AddCommand(newEntitiesListCommand())
 	cmd.AddCommand(newEntitiesGetByUIDCommand())
 	cmd.AddCommand(newEntitiesGetByNameCommand())
@@ -247,6 +256,89 @@ func newEntitiesBatchGetByRefsCommand() *cobra.Command {
 		return nil
 	}
 	return cmd
+}
+
+func newEntitiesValidateCommand() *cobra.Command {
+	cmd := newCommand()
+	cmd.Use = "validate [FILES]"
+	cmd.Short = "Validate entity files"
+	cmd.Args = cobra.MinimumNArgs(1)
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		compiler, err := newEntitySchemaCompiler()
+		if err != nil {
+			return err
+		}
+		var count int
+		for _, arg := range args {
+			if err := filepath.WalkDir(arg, func(path string, d fs.DirEntry, err error) error {
+				if d.IsDir() {
+					return nil
+				}
+				switch filepath.Ext(path) {
+				case ".json":
+					return fmt.Errorf("validation of JSON files not supported")
+				case ".yaml", ".yml":
+					data, err := os.ReadFile(path)
+					if err != nil {
+						return err
+					}
+					decoder := yaml.NewDecoder(bytes.NewReader(data))
+					for {
+						var entity map[string]any
+						if err := decoder.Decode(&entity); err != nil {
+							if errors.Is(err, io.EOF) {
+								break
+							}
+							return err
+						}
+						kind, ok := entity["kind"].(string)
+						if !ok {
+							return fmt.Errorf("%s: unable to determine entity kind", path)
+						}
+						entitySchema, err := compiler.Compile(kind)
+						if err != nil {
+							return err
+						}
+						if err := entitySchema.ValidateInterface(entity); err != nil {
+							return err
+						}
+						count++
+					}
+				}
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		cmd.Printf("%d valid catalog entities", count)
+		return nil
+	}
+	return cmd
+}
+
+func newEntitySchemaCompiler() (*jsonschema.Compiler, error) {
+	files, err := fs.ReadDir(schema.FS(), ".")
+	if err != nil {
+		return nil, err
+	}
+	result := jsonschema.NewCompiler()
+	for _, file := range files {
+		data, err := fs.ReadFile(schema.FS(), file.Name())
+		if err != nil {
+			return nil, err
+		}
+		// Patch schema URI to have empty fragment (required by santhosh-tekuri/jsonschema).
+		data = bytes.ReplaceAll(
+			data,
+			[]byte(`"http://json-schema.org/draft-07/schema"`),
+			[]byte(`"http://json-schema.org/draft-07/schema#"`),
+		)
+		entityName, _, _ := strings.Cut(file.Name(), ".")
+		if err := result.AddResource(entityName, bytes.NewReader(data)); err != nil {
+			return nil, err
+		}
+	}
+	return result, nil
 }
 
 func printRawJSON(cmd *cobra.Command, raw json.RawMessage) {
