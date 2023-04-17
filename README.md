@@ -19,6 +19,9 @@ $ backstage catalog entities list --filter "kind=Component"
 
 # Get an entity in the catalog.
 $ backstage catalog entities get-by-name --kind "User" --name "odsod"
+
+# Validate catalog entities in the ".backstage" dir.
+$ backstage catalog entities validate ".backstage"
 ```
 
 The CLI tool can be downloaded from the [Releases](https://github.com/einride/backstage-go/releases) page.
