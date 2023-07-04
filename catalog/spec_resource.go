@@ -12,4 +12,6 @@ type ResourceSpec struct {
 	System string `json:"system,omitempty"`
 	// An array of entity references to the resources and resources that the resource depends on.
 	DependsOn []string `json:"dependsOn,omitempty"`
+	// An array of entity references to the components and resources that the resource is a dependency of.
+	DependencyOf []string `json:"dependencyOf,omitempty"`
 }
