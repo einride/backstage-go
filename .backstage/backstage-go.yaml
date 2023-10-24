@@ -7,6 +7,9 @@ metadata:
     - url: https://pkg.go.dev/go.einride.tech/backstage
       title: GoDoc
       icon: docs
+  annotations:
+    github.com/project-slug: einride/backstage-go
+    github.com/team-slug: einride/team-cloud-control
 spec:
   type: go-library
   lifecycle: production
