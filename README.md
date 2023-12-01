@@ -1,12 +1,10 @@
 <img src="./docs/backstage-go.svg" align="left" width="140" />
 
-Backstage Go SDK
-================
+# Backstage Go SDK
 
 A Go SDK and CLI tool for working with [Backstage](https://backstage.io).
 
-CLI tool
---------
+## CLI tool
 
 The `backstage` CLI tool provides command-line access to Backstage APIs.
 
@@ -24,12 +22,14 @@ $ backstage catalog entities get-by-name --kind "User" --name "odsod"
 $ backstage catalog entities validate ".backstage"
 ```
 
-The CLI tool can be downloaded from the [Releases](https://github.com/einride/backstage-go/releases) page.
+The CLI tool can be downloaded from the
+[Releases](https://github.com/einride/backstage-go/releases) page.
 
-Software Catalog API
---------------------
+## Software Catalog API
 
-The [`catalog`](https://pkg.go.dev/go.einride.tech/backstage/catalog) package provides a Go client to the [Software Catalog API](https://backstage.io/docs/features/software-catalog/software-catalog-api).
+The [`catalog`](https://pkg.go.dev/go.einride.tech/backstage/catalog) package
+provides a Go client to the
+[Software Catalog API](https://backstage.io/docs/features/software-catalog/software-catalog-api).
 
 ```go
 package main
