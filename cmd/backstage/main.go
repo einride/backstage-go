@@ -129,7 +129,7 @@ func newEntitiesListCommand() *cobra.Command {
 	cmd.Short = "List entities in the catalog"
 	filters := cmd.Flags().StringArray("filter", nil, "select only a subset of all entities")
 	fields := cmd.Flags().StringSlice("fields", nil, "select only parts of each entity")
-	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+	cmd.RunE = func(cmd *cobra.Command, _ []string) error {
 		client, err := newCatalogClient()
 		if err != nil {
 			return err
@@ -167,7 +167,7 @@ func newEntitiesGetByNameCommand() *cobra.Command {
 	namespace := cmd.Flags().String("namespace", "default", "namespace of the entity to get")
 	name := cmd.Flags().String("name", "", "name of the entity to get")
 	_ = cmd.MarkFlagRequired("name")
-	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+	cmd.RunE = func(cmd *cobra.Command, _ []string) error {
 		client, err := newCatalogClient()
 		if err != nil {
 			return err
@@ -192,7 +192,7 @@ func newEntitiesGetByUIDCommand() *cobra.Command {
 	cmd.Short = "Get an entity by its UID"
 	uid := cmd.Flags().String("uid", "", "UID of the entity to get")
 	_ = cmd.MarkFlagRequired("uid")
-	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+	cmd.RunE = func(cmd *cobra.Command, _ []string) error {
 		client, err := newCatalogClient()
 		if err != nil {
 			return err
@@ -215,7 +215,7 @@ func newEntitiesDeleteByUIDCommand() *cobra.Command {
 	cmd.Short = "Delete an entity by its UID"
 	uid := cmd.Flags().String("uid", "", "UID of the entity to delete")
 	_ = cmd.MarkFlagRequired("uid")
-	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+	cmd.RunE = func(cmd *cobra.Command, _ []string) error {
 		client, err := newCatalogClient()
 		if err != nil {
 			return err
@@ -234,7 +234,7 @@ func newEntitiesBatchGetByRefsCommand() *cobra.Command {
 	entityRefs := cmd.Flags().StringSlice("entity-refs", nil, "refs of the entities to get")
 	_ = cmd.MarkFlagRequired("entity-refs")
 	fields := cmd.Flags().StringSlice("fields", nil, "select only parts of each entity")
-	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+	cmd.RunE = func(cmd *cobra.Command, _ []string) error {
 		client, err := newCatalogClient()
 		if err != nil {
 			return err
@@ -270,7 +270,7 @@ func newEntitiesValidateCommand() *cobra.Command {
 		}
 		var count int
 		for _, arg := range args {
-			if err := filepath.WalkDir(arg, func(path string, d fs.DirEntry, err error) error {
+			if err := filepath.WalkDir(arg, func(path string, d fs.DirEntry, _ error) error {
 				if d.IsDir() {
 					return nil
 				}
