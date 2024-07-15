@@ -109,7 +109,7 @@ func GoReleaser(ctx context.Context, snapshot bool) error {
 	}
 	args := []string{
 		"release",
-		"--rm-dist",
+		"--clean",
 	}
 	if len(sggit.Tags(ctx)) == 0 && !snapshot {
 		sg.Logger(ctx).Printf("no git tag found for %s, forcing snapshot mode", sggit.ShortSHA(ctx))
