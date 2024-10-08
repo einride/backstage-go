@@ -9,12 +9,13 @@ import (
 
 func TestEntity_SystemSpec(t *testing.T) {
 	//nolint: lll
-	const system = `{"apiVersion":"backstage.io/v1alpha1","kind":"System","metadata":{"name":"podcast","description":"Podcast playback"},"spec":{"owner":"team-b","domain":"playback"}}`
+	const system = `{"apiVersion":"backstage.io/v1alpha1","kind":"System","metadata":{"name":"podcast","description":"Podcast playback"},"spec":{"owner":"team-b","domain":"playback", "type":"product"}}`
 	var entity Entity
 	assert.NilError(t, json.Unmarshal([]byte(system), &entity))
 	expected := &SystemSpec{
 		Owner:  "team-b",
 		Domain: "playback",
+		Type:   "product",
 	}
 	actual, err := entity.SystemSpec()
 	assert.NilError(t, err)
