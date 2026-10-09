@@ -5,6 +5,7 @@ updates:
     directory: .sage
     schedule:
       interval: monthly
+    open-pull-requests-limit: 0
 
     cooldown:
       default-days: 7
@@ -19,6 +20,7 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    open-pull-requests-limit: 0
 
     cooldown:
       default-days: 7
@@ -33,6 +35,7 @@ updates:
     directory: cmd/backstage
     schedule:
       interval: monthly
+    open-pull-requests-limit: 0
     cooldown:
       default-days: 7
       semver-major-days: 30
