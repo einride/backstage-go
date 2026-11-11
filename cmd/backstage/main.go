@@ -278,7 +278,8 @@ func newEntitiesValidateCommand() *cobra.Command {
 				case ".json":
 					return fmt.Errorf("validation of JSON files not supported")
 				case ".yaml", ".yml":
-					data, err := os.ReadFile(path)
+					// Paths come from the CLI user's own arguments; symlink TOCTOU is not a concern here.
+					data, err := os.ReadFile(path) //nolint:gosec
 					if err != nil {
 						return err
 					}

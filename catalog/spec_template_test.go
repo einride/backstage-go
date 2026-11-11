@@ -17,12 +17,20 @@ func TestEntity_TemplateSpec(t *testing.T) {
 		Type:  "service",
 		Owner: "backstage/techdocs-core",
 		RawParameters: []json.RawMessage{
-			json.RawMessage(`{"title":"Fill in some steps","required":["name"],"properties":{"name":{"title":"Name","type":"string","description":"Unique name of the component","ui:autofocus":true,"ui:options":{"rows":5}}}}`),
-			json.RawMessage(`{"title":"Choose a location","required":["repoUrl"],"properties":{"repoUrl":{"title":"Repository Location","type":"string","ui:field":"RepoUrlPicker","ui:options":{"allowedHosts":["github.com"]}}}}`),
+			json.RawMessage(
+				`{"title":"Fill in some steps","required":["name"],"properties":{"name":{"title":"Name","type":"string","description":"Unique name of the component","ui:autofocus":true,"ui:options":{"rows":5}}}}`,
+			),
+			json.RawMessage(
+				`{"title":"Choose a location","required":["repoUrl"],"properties":{"repoUrl":{"title":"Repository Location","type":"string","ui:field":"RepoUrlPicker","ui:options":{"allowedHosts":["github.com"]}}}}`,
+			),
 		},
 		RawSteps: []json.RawMessage{
-			json.RawMessage(`{"id":"fetch-base","name":"Fetch Base","action":"fetch:template","input":{"url":"./template","values":{"name":"{{ parameters.name }}"}}}`),
-			json.RawMessage(`{"id":"fetch-docs","name":"Fetch Docs","action":"fetch:plain","input":{"targetPath":"./community","url":"https://github.com/backstage/community/tree/main/backstage-community-sessions"}}`),
+			json.RawMessage(
+				`{"id":"fetch-base","name":"Fetch Base","action":"fetch:template","input":{"url":"./template","values":{"name":"{{ parameters.name }}"}}}`,
+			),
+			json.RawMessage(
+				`{"id":"fetch-docs","name":"Fetch Docs","action":"fetch:plain","input":{"targetPath":"./community","url":"https://github.com/backstage/community/tree/main/backstage-community-sessions"}}`,
+			),
 		},
 	}
 	actual, err := entity.TemplateSpec()

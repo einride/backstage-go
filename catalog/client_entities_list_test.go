@@ -45,7 +45,7 @@ func TestClient_ListEntities(t *testing.T) {
 			assert.Equal(t, "100", r.URL.Query().Get("limit"))
 			assert.Equal(t, "bar", r.URL.Query().Get("after"))
 			w.Header().Set("link", `<https://example.com?after=foo>; rel="next"`)
-			_, _ = w.Write([]byte(fmt.Sprintf(`[%s,%s]`, system1, system2)))
+			_, _ = fmt.Fprintf(w, `[%s,%s]`, system1, system2)
 		})
 		actual, err := client.ListEntities(ctx, &ListEntitiesRequest{
 			Filters: []string{"kind=Component"},

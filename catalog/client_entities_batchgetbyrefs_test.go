@@ -46,7 +46,7 @@ func TestClient_BatchGetEntitiesByRefs(t *testing.T) {
 			assert.NilError(t, err)
 			assert.NilError(t, r.Body.Close())
 			assert.Equal(t, `{"entityRefs":["foo","bar"],"fields":["baz"]}`, string(body))
-			_, _ = w.Write([]byte(fmt.Sprintf(`{"items":[%s,%s]}`, system1, system2)))
+			_, _ = fmt.Fprintf(w, `{"items":[%s,%s]}`, system1, system2)
 		})
 		actual, err := client.BatchGetEntitiesByRefs(ctx, &BatchGetEntitiesByRefsRequest{
 			EntityRefs: []string{"foo", "bar"},
